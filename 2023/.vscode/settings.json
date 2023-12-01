@@ -1,4 +1,12 @@
 {
+  "cmake.debugConfig": {
+    "args": [
+      "--day",
+      "1",
+      "--part",
+      "2"
+    ]
+  },
   "files.associations": {
     "bashrc": "shellscript",
     "bash_*": "shellscript",

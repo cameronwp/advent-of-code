@@ -1,5 +1,6 @@
 #include "day1.hpp"
 #include <iostream>
+#include <vector>
 
 /*
 The newly-improved calibration document consists of lines of text; each line
@@ -21,13 +22,12 @@ Consider your entire calibration document. What is the sum of all of the
 calibration values?
 */
 
-bool isNumber(char c) {
+bool is_number(char c) {
   int x = c;
   return x >= 48 && x <= 57;
 }
 
-/** Run the day's problem */
-std::string Day1::run() {
+std::string Day1::part1() {
   int sum = 0;
 
   std::string line;
@@ -37,7 +37,7 @@ std::string Day1::run() {
     int last = 0;
 
     for (char &c : line) {
-      if (!isNumber(c)) {
+      if (!is_number(c)) {
         continue;
       }
 
@@ -58,4 +58,107 @@ std::string Day1::run() {
     sum += first + last;
   }
   return std::to_string(sum);
+}
+
+/*
+Your calculation isn't quite right. It looks like some of the digits are
+actually spelled out with letters: one, two, three, four, five, six, seven,
+eight, and nine also count as valid "digits".
+
+Equipped with this new information, you now need to find the real first and last
+digit on each line. For example:
+
+two1nine
+eightwothree
+abcone2threexyz
+xtwone3four
+4nineeightseven2
+zoneight234
+7pqrstsixteen
+
+In this example, the calibration values are 29, 83, 13, 24, 42, 14, and 76.
+Adding these together produces 281.
+
+What is the sum of all of the calibration values?
+*/
+
+/**
+ * Return -1 if no word is found
+ */
+int find_number_in_words(char c, std::vector<std::string> *maybe_words) {
+  std::vector<std::string> number_words{"zero",  "one",  "two", "three",
+                                        "four",  "five", "six", "seven",
+                                        "eight", "nine"};
+
+  for (std::string &maybe_word : *maybe_words) {
+    maybe_word.push_back(c);
+  }
+
+  std::string new_word(1, c);
+  maybe_words->push_back(new_word);
+
+  for (std::string &maybe_word : *maybe_words) {
+    for (std::string &number_word : number_words) {
+      if (maybe_word == number_word) {
+        // TODO iterate so we get the place of the number word too
+        std::cout << maybe_word << std::endl;
+      }
+    }
+  }
+
+  return 0;
+}
+
+std::string Day1::part2() {
+  int sum = 0;
+
+  std::string line;
+  while ((line = nextline()) != "") {
+    int line_len = line.length();
+    int first = -1;
+    int last = 0;
+
+    std::vector<std::string> maybe_words;
+
+    for (char &c : line) {
+      int x;
+      if (!is_number(c)) {
+        x = find_number_in_words(c, &maybe_words);
+        if (x < 0) {
+          continue;
+        }
+      } else {
+        x = c;
+        // 0 is 48 in ascii
+        x -= 48;
+      }
+
+      if (first == -1) {
+        // first digit is the tens place
+        first = x * 10;
+        // if there is no second digit for the ones, use the first again
+        last = x;
+      } else {
+        last = x;
+      }
+    }
+
+    sum += first + last;
+  }
+  return std::to_string(sum);
+}
+
+/** Run the day's problems */
+void Day1::run(int part) {
+  if (part != 1 && part != 2) {
+    std::cout << "--part must be 1 or 2" << std::endl;
+  }
+
+  std::cout << "Day " << thisDay;
+  std::cout << " part 2: " << part2() << std::endl;
+  // if (part == 1) {
+  //   std::cout << " part 1: " << part1() << std::endl;
+  // } else {
+  //   std::cout << " part 2: " << part2() << std::endl;
+  // };
 }

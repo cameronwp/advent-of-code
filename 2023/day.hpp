@@ -7,9 +7,10 @@
 
 class Day {
   public:
+    int thisDay;
+
     Day(int day);
     ~Day();
-    std::string run();
     std::string nextline();
 
   private:

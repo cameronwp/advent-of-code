@@ -19,7 +19,6 @@ find_package(Boost 1.76.0 COMPONENTS program_options)
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
-    # add_executable(2023 main.cpp day.cpp day1.cpp)
     add_executable(2023 main.cpp)
     target_sources(2023 PUBLIC
         ${SRC_FILES}

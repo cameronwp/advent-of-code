@@ -4,7 +4,7 @@
 
 
 Day::Day(int day) {
-  std::cout << "in Day constructor" << std::endl;
+  thisDay = day;
   stream.open("data/day" + std::to_string(day) + ".txt");
 }
 
