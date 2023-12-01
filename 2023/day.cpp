@@ -2,13 +2,18 @@
 #include <fstream>
 #include "day.hpp"
 
+
 Day::Day(int day) {
   std::cout << "in Day constructor" << std::endl;
-  // std::ifstream file("data/day" + std::to_string(day) + ".txt");
+  stream.open("data/day" + std::to_string(day) + ".txt");
 }
 
-std::string Day::nextLine() {
+Day::~Day() {
+  stream.close();
+}
+
+std::string Day::nextline() {
   std::string line;
-  // std::getline(file, line);
+  std::getline(stream, line);
   return line;
 }

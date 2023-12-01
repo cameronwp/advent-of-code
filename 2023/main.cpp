@@ -40,5 +40,7 @@ int main(int ac, char *av[]) {
   std::string result;
   result = day.run();
 
+  std::cout << result << std::endl;
+
   return 0;
 }
