@@ -1,0 +1,10 @@
+#+TITLE: Advent of Code 2022
+
+Common lisp
+
+** Dependencies
+
+#+begin_src lisp
+(ql:quickload :alexandria)
+(ql:quickload :iterate)
+#+end_src
