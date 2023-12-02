@@ -9,6 +9,7 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 file(GLOB SRC_FILES
+    "lib/*.cpp"
     "*.cpp"
 )
 

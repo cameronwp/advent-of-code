@@ -6,6 +6,8 @@
 namespace po = boost::program_options;
 
 int main(int ac, char *av[]) {
+  std::cout << std::boolalpha;
+
   int day, part;
 
   try {
@@ -30,6 +32,10 @@ int main(int ac, char *av[]) {
     }
     if (vm.count("part")) {
       part = vm["part"].as<int>();
+      if (part != 1 && part != 2) {
+        std::cout << "--part must be 1 or 2" << std::endl;
+        return 1;
+      }
     }
   } catch (std::exception &e) {
     std::cerr << "error: " << e.what() << "\n";
