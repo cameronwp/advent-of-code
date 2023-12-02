@@ -1,4 +1,5 @@
 #include "day1.hpp"
+#include "day2.hpp"
 #include <boost/program_options.hpp>
 #include <iostream>
 
@@ -39,6 +40,9 @@ int main(int ac, char *av[]) {
 
   if (day == 1) {
     Day1 day;
+    day.run(part);
+  } else if (day == 2) {
+    Day2 day;
     day.run(part);
   } else {
     std::cout << "day was not set.\n";
