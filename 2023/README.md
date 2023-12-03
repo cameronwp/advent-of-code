@@ -8,7 +8,7 @@ Compile with VSCode:
 Run:
 
 ```sh
-./build/2023 --day <day-to-run> --part <part-to-run>
+./build/2023 --day INT --part INT
 ```
 
-Every time you add new source code files, you need to re-run `CMake Configure`
+Every time you add new source code files, you need to re-run `ctrl-P: CMake Configure`
