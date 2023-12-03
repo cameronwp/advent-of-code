@@ -2,9 +2,9 @@
   "cmake.debugConfig": {
     "args": [
       "--day",
-      "1",
+      "3",
       "--part",
-      "2"
+      "1"
     ]
   },
   "files.associations": {
