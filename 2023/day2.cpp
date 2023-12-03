@@ -1,5 +1,6 @@
 #include "day2.hpp"
 #include "lib/trim.cpp"
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -114,12 +115,12 @@ string Day2::part1() {
       second_input.str(element);
       for (string cube_counts; getline(second_input, cube_counts, ';');) {
         if (!under_max_counts(cube_counts)) {
-          goto endloop;
+          goto nextline;
         }
       }
 
       sum += game_id;
-    endloop:
+    nextline:
       continue;
     }
   }
@@ -127,15 +128,110 @@ string Day2::part1() {
 }
 
 /*
+As you continue your walk, the Elf poses a second question: in each game you
+played, what is the fewest number of cubes of each color that could have been in
+the bag to make the game possible?
 
+Again consider the example games from earlier:
+
+Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
+Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
+Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
+
+    In game 1, the game could have been played with as few as 4 red, 2 green,
+and 6 blue cubes. If any color had even one fewer cube, the game would have been
+impossible. Game 2 could have been played with a minimum of 1 red, 3 green, and
+4 blue cubes. Game 3 must have been played with at least 20 red, 13 green, and 6
+blue cubes. Game 4 required at least 14 red, 3 green, and 15 blue cubes. Game 5
+needed no fewer than 6 red, 3 green, and 2 blue cubes in the bag.
+
+The power of a set of cubes is equal to the numbers of red, green, and blue
+cubes multiplied together. The power of the minimum set of cubes in game 1
+is 48. In games 2-5 it was 12, 1560, 630, and 36, respectively. Adding up these
+five powers produces the sum 2286.
+
+For each game, find the minimum set of cubes that must have been present. What
+is the sum of the power of these sets?
 */
 
-string Day2::part2() {
-  string line;
-  while ((line = nextline()) != "") {
-    // solution
+vector<int> get_counts(string cube_counts) {
+  int reds = 0;
+  int greens = 0;
+  int blues = 0;
+
+  // now split on spaces to get each color count pair
+  istringstream input;
+  input.str(cube_counts);
+  for (string color_count; getline(input, color_count, ',');) {
+    trim(color_count);
+
+    int count;
+
+    int i = 0;
+    istringstream input;
+    input.str(color_count);
+    for (string element; getline(input, element, ' ');) {
+      if (i == 0) {
+        count = stoi(element);
+        i++;
+        continue;
+      }
+
+      if (element == "red") {
+        reds = count;
+      }
+      if (element == "green") {
+        greens = count;
+      }
+      if (element == "blue") {
+        blues = count;
+      }
+    }
   }
-  return "";
+
+  return vector<int>{reds, greens, blues};
+}
+
+string Day2::part2() {
+  int sum = 0;
+
+  for (string line; (line = nextline()) != "";) {
+    int game_id;
+
+    // split on the colon to get "Game X", "...cubes"
+    istringstream input;
+    input.str(line);
+    int i = 0;
+    for (string element; getline(input, element, ':');) {
+      trim(element);
+
+      if (i == 0) {
+        // don't care about the Game ID this time
+        i++;
+        continue;
+      }
+
+      int reds = 0;
+      int blues = 0;
+      int greens = 0;
+
+      // split on semi-colon to get each presentation of cubes
+      istringstream second_input;
+      second_input.str(element);
+      for (string cube_counts; getline(second_input, cube_counts, ';');) {
+        vector<int> counts = get_counts(cube_counts);
+
+        reds = max(counts[0], reds);
+        greens = max(counts[1], greens);
+        blues = max(counts[2], blues);
+      }
+
+      sum += (reds * greens * blues);
+    }
+  }
+  return to_string(sum);
 }
 
 /** Run the day's problems */
