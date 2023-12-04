@@ -159,14 +159,121 @@ string Day3::part1() {
 }
 
 /*
+The missing part wasn't the only issue - one of the gears in the engine is
+wrong. A gear is any * symbol that is adjacent to exactly two part numbers. Its
+gear ratio is the result of multiplying those two numbers together.
 
+This time, you need to find the gear ratio of every gear and add them all up so
+that the engineer can figure out which gear needs to be replaced.
+
+Consider the same engine schematic again:
+
+467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..
+
+In this schematic, there are two gears. The first is in the top left; it has
+part numbers 467 and 35, so its gear ratio is 16345. The second gear is in the
+lower right; its gear ratio is 451490. (The * adjacent to 617 is not a gear
+because it is only adjacent to one part number.) Adding up all of the gear
+ratios produces 467835.
+
+What is the sum of all of the gear ratios in your engine schematic?
 */
 
 string Day3::part2() {
+  int sum = 0;
+
+  // {y: {x: 123, x+1: 123, x+2: 123}}
+  map<int, map<int, size_t>> y_x_numbers;
+  vector<pair<int, int>> y_x_gears;
+  vector<int> numbers;
+
+  int y = 0;
+  int max_x = 0;
+  int max_y = 0;
   for (string line; (line = nextline()) != "";) {
-    // solve it
+    string number_in_progress = "";
+
+    for (int x = 0; x < line.size(); x++) {
+      if (y == 0) {
+        max_x = max(max_x, x);
+      }
+
+      if (SYMBOLS.find(line[x]) != string::npos) {
+        if (number_in_progress != "") {
+          // // we know the last number is done. save it at each of the x
+          // positions
+          track_number(number_in_progress, x, y, numbers, y_x_numbers);
+        }
+
+        if (line[x] == '*') {
+          y_x_gears.push_back(pair<int, int>{y, x});
+        }
+
+        number_in_progress = "";
+        continue;
+      }
+
+      // must be a number
+      number_in_progress.push_back(line[x]);
+    }
+
+    // we're at the end of the line. we could have a number!
+    if (number_in_progress != "") {
+      track_number(number_in_progress, max_x, y, numbers, y_x_numbers);
+    }
+
+    y++;
   }
-  return "";
+
+  max_y = y - 1;
+
+  vector<int> numbers_to_sum;
+
+  for (int i = 0; i < y_x_gears.size(); i++) {
+    set<pair<int, int>> adjacents =
+        get_adjacent_coords(y_x_gears[i], max_y, max_x);
+
+    set<size_t> adjacents_found;
+
+    // find gears that have exactly two adjacents
+    for (auto &adjacent : adjacents) {
+      int y = adjacent.first;
+      int x = adjacent.second;
+
+      if (y_x_numbers.find(y) != y_x_numbers.end()) {
+        if (y_x_numbers[y].find(x) != y_x_numbers[y].end()) {
+          adjacents_found.insert(y_x_numbers[y][x]);
+        }
+      }
+    }
+
+    if (adjacents_found.size() != 2) {
+      continue;
+    }
+
+    // multiply the adjancents
+    int multiplied = 1;
+    for (auto &num_index : adjacents_found) {
+      multiplied *= numbers[num_index];
+    }
+
+    numbers_to_sum.push_back(multiplied);
+  }
+
+  for (auto &gear : numbers_to_sum) {
+    sum += gear;
+  }
+
+  return to_string(sum);
 }
 
 /** Run the day's problems */

@@ -14,7 +14,7 @@ Common Lisp
 
 ## 2020
 
-Missing
+_skipped_
 
 ## 2019
 
