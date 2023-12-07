@@ -141,8 +141,6 @@ string Day5::part1() {
   int map_pos = 0;
   bool have_seeds = false;
   for (string line; (line = nextline()) != uninitialized;) {
-    cout << line << endl;
-
     if (!have_seeds) {
       // capture the seeds and put them in their starting position
       split_and_loop(line.substr(7), ' ', [&](string num, int _i) {
@@ -209,15 +207,115 @@ string Day5::part1() {
 }
 
 /*
+Everyone will starve if you only plant such a small number of seeds. Re-reading
+the almanac, it looks like the seeds: line actually describes ranges of seed
+numbers.
 
+The values on the initial seeds: line come in pairs. Within each pair, the first
+value is the start of the range and the second value is the length of the range.
+So, in the first line of the example above:
+
+seeds: 79 14 55 13
+
+This line describes two ranges of seed numbers to be planted in the garden. The
+first range starts with seed number 79 and contains 14 values: 79, 80, ...,
+91, 92. The second range starts with seed number 55 and contains 13 values: 55,
+56, ..., 66, 67.
+
+Now, rather than considering four seed numbers, you need to consider a total of
+27 seed numbers.
+
+In the above example, the lowest location number can be obtained from seed
+number 82, which corresponds to soil 84, fertilizer 84, water 84, light 77,
+temperature 45, humidity 46, and location 46. So, the lowest location number
+is 46.
+
+Consider all of the initial seed numbers listed in the ranges on the first line
+of the almanac. What is the lowest location number that corresponds to any of
+the initial seed numbers?
  */
 
 string Day5::part2() {
-  for (string line; (line = nextline()) != "";) {
-    //
+  vector<vector<long long int>> seed_tracker{vector<long long int>{}};
+
+  // which map we're on
+  int map_pos = 0;
+  bool have_seeds = false;
+  for (string line; (line = nextline()) != uninitialized;) {
+    if (!have_seeds) {
+      // capture the seeds and put them in their starting position
+
+      long long int last_number;
+
+      split_and_loop(line.substr(7), ' ', [&](string num, int i) {
+        trim(num);
+        long long int n = stoll(num);
+
+        if (i % 2 == 0) {
+          seed_tracker[0].push_back(n);
+          last_number = n;
+        } else {
+          for (int j = 1; j <= n; j++) {
+            seed_tracker[0].push_back(last_number + j);
+          }
+        }
+      });
+
+      have_seeds = true;
+      continue;
+    }
+
+    if (line == "") {
+      continue;
+    }
+
+    if (int(line[0]) > 57) {
+      map_pos++;
+      int num_seeds = seed_tracker[map_pos - 1].size();
+      long long int sizel = num_seeds;
+      seed_tracker.push_back(vector<long long int>(sizel));
+      seed_tracker[map_pos] = seed_tracker[map_pos - 1];
+      continue;
+    }
+
+    long long int destination_range_start, source_range_start, range_length;
+
+    split_and_loop(line, ' ', [&](string num, int j) {
+      trim(num);
+
+      if (j == 0) {
+        destination_range_start = stoll(num);
+      } else if (j == 1) {
+        source_range_start = stoll(num);
+      } else if (j == 2) {
+        range_length = stoll(num);
+      }
+    });
+
+    long long int source_range_end = source_range_start + range_length;
+
+    vector<long long int> &last_round = seed_tracker[map_pos - 1];
+    vector<long long int> &this_round = seed_tracker[map_pos];
+
+    for (int k = 0; k < this_round.size(); k++) {
+      long long int seed = last_round.at(k);
+      bool seed_in_source_range =
+          seed >= source_range_start && seed < source_range_end;
+      if (seed_in_source_range) {
+        long long int destination =
+            destination_range_start + (seed - source_range_start);
+        this_round.at(k) = destination;
+      }
+    }
   }
 
-  return "";
+  long long int min_location = numeric_limits<long long int>::max();
+
+  for (auto &loc : seed_tracker.back()) {
+    min_location = min(min_location, loc);
+  }
+
+  return to_string(min_location);
 }
 
 /** Run the day's problems */
