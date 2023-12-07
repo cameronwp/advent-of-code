@@ -132,8 +132,6 @@ numbers?
 */
 
 string Day5::part1() {
-  cout << endl;
-
   // a matrix where column is the stage of the run, e.g. seed-to-soil, and each
   // row is a seed. as the run progresses, seeds move left to right. not
   // guaranteed that the index of each seed remains the same throughout the run
@@ -150,8 +148,6 @@ string Day5::part1() {
       split_and_loop(line.substr(7), ' ', [&](string num, int _i) {
         trim(num);
         long long int n = stoll(num);
-        cout << num << " -> " << n << endl;
-        // cout << "found seed: '" << num << "'" << endl;
         seed_tracker[0].push_back(n);
       });
 
@@ -172,7 +168,7 @@ string Day5::part1() {
       continue;
     }
 
-    int destination_range_start, source_range_start, range_length;
+    long long int destination_range_start, source_range_start, range_length;
 
     split_and_loop(line, ' ', [&](string num, int j) {
       trim(num);
@@ -186,22 +182,18 @@ string Day5::part1() {
       }
     });
 
-    int source_range_end = source_range_start + range_length;
+    long long int source_range_end = source_range_start + range_length;
 
     vector<long long int> &last_round = seed_tracker[map_pos - 1];
     vector<long long int> &this_round = seed_tracker[map_pos];
 
-    // cout << "Source [" << source_range_start << ", " << source_range_end <<
-    // "]"
-    // << endl;
-
     for (int k = 0; k < this_round.size(); k++) {
-      int seed = last_round.at(k);
+      long long int seed = last_round.at(k);
       bool seed_in_source_range =
           seed >= source_range_start && seed < source_range_end;
-      cout << seed << " " << (seed_in_source_range ? "true" : "false") << endl;
       if (seed_in_source_range) {
-        int destination = destination_range_start + (seed - source_range_start);
+        long long int destination =
+            destination_range_start + (seed - source_range_start);
         this_round.at(k) = destination;
       }
     }
