@@ -9,6 +9,7 @@
 class Day {
 public:
   int thisDay;
+  std::string uninitialized = "__UNINITIALIZED__";
 
   Day(int day);
   ~Day();

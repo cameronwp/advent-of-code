@@ -2,6 +2,7 @@
 #include "day2.hpp"
 #include "day3.hpp"
 #include "day4.hpp"
+#include "day5.hpp"
 #include <boost/program_options.hpp>
 #include <iostream>
 
@@ -55,6 +56,8 @@ int main(int ac, char *av[]) {
     Day3 day;
   } else if (day == 4) {
     Day4 day;
+  } else if (day == 5) {
+    Day5 day;
     day.run(part);
   } else {
     std::cout << "day was not set.\n";

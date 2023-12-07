@@ -10,7 +10,7 @@ Day::Day(int day) {
 Day::~Day() { stream.close(); }
 
 std::string Day::nextline() {
-  std::string line;
+  std::string line = uninitialized;
   std::getline(stream, line);
   return line;
 }

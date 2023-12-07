@@ -57,7 +57,7 @@ string Day4::part1() {
   int sum = 0;
 
   for (string line; (line = nextline()) != "";) {
-    split_and_loop(line, ':', [&sum, &line](string element) {
+    split_and_loop(line, ':', [&sum, &line](string element, int _i) {
       // we're looking at the "Card X" part of the line
       if (element[0] == 'C') {
         return;
@@ -68,12 +68,12 @@ string Day4::part1() {
       // winning numbers | our numbers
       int i = 0;
       int point_value = 0;
-      split_and_loop(element, '|', [&](string card) {
+      split_and_loop(element, '|', [&](string card, int _i) {
         trim(card);
 
         // split on spaces, turn into ints
         // we'll run this for the winning numbers first, then our numbers
-        split_and_loop(card, ' ', [&](string num) {
+        split_and_loop(card, ' ', [&](string num, int _i) {
           trim(num);
 
           if (num == "") {
@@ -170,7 +170,7 @@ string Day4::part2() {
 
     int counts_to_run = card_counts[i];
 
-    split_and_loop(line, ':', [&](string element) {
+    split_and_loop(line, ':', [&](string element, int _i) {
       // we're looking at the "Card X" part of the line
       if (element[0] == 'C') {
         return;
@@ -181,12 +181,12 @@ string Day4::part2() {
       // winning numbers | our numbers
       int is_winning_side = true;
       int hits = 0;
-      split_and_loop(element, '|', [&](string card) {
+      split_and_loop(element, '|', [&](string card, int _i) {
         trim(card);
 
         // split on spaces, turn into ints
         // we'll run this for the winning numbers first, then our numbers
-        split_and_loop(card, ' ', [&](string num) {
+        split_and_loop(card, ' ', [&](string num, int _i) {
           trim(num);
 
           if (num == "") {
