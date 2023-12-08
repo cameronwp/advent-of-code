@@ -45,10 +45,7 @@ Now, you can determine the total winnings of this set of hands by adding up the 
 Find the rank of every hand in your set. What are the total winnings?
 """
 
-card_ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
-
-# hand ranks
-# could we use 7 bits to represent hands? 0000000. if there's a tie, then iterate and look for high card at each index
+CARD_RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 
 
 class Hand:
@@ -70,8 +67,8 @@ class Hand:
             return my_score < other_score
 
         for i in range(5):
-            my_card_rank = card_ranks.index(self.cards[i])
-            other_card_rank = card_ranks.index(other.cards[i])
+            my_card_rank = CARD_RANKS.index(self.cards[i])
+            other_card_rank = CARD_RANKS.index(other.cards[i])
             if my_card_rank != other_card_rank:
                 return my_card_rank < other_card_rank
 
@@ -79,6 +76,19 @@ class Hand:
         return False
 
     def score(self):
+        """
+        Returns a 6 bit number to represent the hand's score
+        111111
+        ^ 5 of a kind
+         ^ 4 of a kind
+          ^ 3 of a kind
+           ^ 2 pair
+            ^ 1 pair
+             ^ high card
+
+        A full house will have both 3 of a kind and 1 pair.
+        2 pair will have both 2 pair and 1 pair
+        """
         if self._score != -1:
             return self._score
 
