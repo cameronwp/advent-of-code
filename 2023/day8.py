@@ -143,7 +143,6 @@ def part2():
             starts.append(node)
 
     for s in range(len(starts)):
-        print(f"Start: {s}/{len(starts)}")
         num_steps = 0
         curr = starts[s]
         for dir in gen_dir(steps):
