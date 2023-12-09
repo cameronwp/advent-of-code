@@ -52,6 +52,7 @@ class Hand:
     def __init__(self, cards):
         self.cards = cards
         self._score = -1
+        self.card_ranks = CARD_RANKS
 
     def __str__(self):
         return f"{self.cards} ({self.score()})"
@@ -66,9 +67,10 @@ class Hand:
         if my_score != other_score:
             return my_score < other_score
 
+        # tiebreak by comparing cards at each index
         for i in range(5):
-            my_card_rank = CARD_RANKS.index(self.cards[i])
-            other_card_rank = CARD_RANKS.index(other.cards[i])
+            my_card_rank = self.card_ranks.index(self.cards[i])
+            other_card_rank = self.card_ranks.index(other.cards[i])
             if my_card_rank != other_card_rank:
                 return my_card_rank < other_card_rank
 
@@ -124,17 +126,109 @@ def part1():
         cards, bid = line.split()
         puzzle_input.append({"cards": Hand(cards), "bid": int(bid)})
 
-    ranked_puzzle_input = sorted(puzzle_input, key=lambda o : o["cards"])
+    ranked_puzzle_input = sorted(puzzle_input, key=lambda o: o["cards"])
     return sum([wager["bid"] * (i + 1) for i, wager in enumerate(ranked_puzzle_input)])
 
+
 """
-Instructions here
+To make things a little more interesting, the Elf introduces one additional rule. Now, J cards are jokers - wildcards that can act like whatever card would make the hand the strongest type possible.
+
+To balance this, J cards are now the weakest individual cards, weaker even than 2. The other cards stay in the same order: A, K, Q, T, 9, 8, 7, 6, 5, 4, 3, 2, J.
+
+J cards can pretend to be whatever card is best for the purpose of determining hand type; for example, QJJQ2 is now considered four of a kind. However, for the purpose of breaking ties between two hands of the same type, J is always treated as J, not the card it's pretending to be: JKKK2 is weaker than QQQQ2 because J is weaker than Q.
+
+Now, the above example goes very differently:
+
+32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483
+
+    32T3K is still the only one pair; it doesn't contain any jokers, so its strength doesn't increase.
+    KK677 is now the only two pair, making it the second-weakest hand.
+    T55J5, KTJJT, and QQQJA are now all four of a kind! T55J5 gets rank 3, QQQJA gets rank 4, and KTJJT gets rank 5.
+
+With the new joker rule, the total winnings in this example are 5905.
+
+Using the new joker rule, find the rank of every hand in your set. What are the new total winnings?
 """
+
+CARD_RANKS_JOKER = ["J", "2", "3", "4", "5", "6", "7", "8", "9", "T", "Q", "K", "A"]
+
+
+class HandJoker(Hand):
+    def __init__(self, cards):
+        super().__init__(cards)
+        self.card_ranks = CARD_RANKS_JOKER
+
+    def score(self):
+        """
+        Returns a 6 bit number to represent the hand's score
+        111111
+        ^ 5 of a kind
+         ^ 4 of a kind
+          ^ 3 of a kind
+           ^ 2 pair
+            ^ 1 pair
+             ^ high card
+
+        A full house will have both 3 of a kind and 1 pair.
+        2 pair will have both 2 pair and 1 pair
+        """
+        if self._score != -1:
+            return self._score
+
+        # start with a high card hand
+        score = 1
+
+        hits = {card: 0 for card in set(self.cards)}
+        for card in self.cards:
+            hits[card] += 1
+
+        num_jokers = hits.get("J", 0)
+
+        hits_without_jokers = sorted(
+            [{"hits": hits[card], "card": card} for card in hits if card != "J"],
+            key=lambda o: o["hits"],
+            reverse=True,
+        )
+
+        if num_jokers == 5:
+            hits_without_jokers = [{"card": "J", "hits": 5}]
+        else:
+            hits_without_jokers[0]["hits"] += num_jokers
+
+        num_pairs = 0
+        for card in hits_without_jokers:
+            if card["hits"] == 5:
+                score = score | 2**5
+            if card["hits"] == 4:
+                score = score | 2**4
+            if card["hits"] == 3:
+                score = score | 2**3
+            if card["hits"] == 2:
+                num_pairs += 1
+                if num_pairs == 1:
+                    score = score | 2**1
+                elif num_pairs == 2:
+                    score = score | 2**2
+
+        self._score = score
+        return score
+
+
+# TODO run tests with weird hands with joker
 
 
 def part2():
+    puzzle_input = []
     for line in open_puzzle_input_and_loop(day=7):
-        pass
+        cards, bid = line.split()
+        puzzle_input.append({"cards": HandJoker(cards), "bid": int(bid)})
+
+    ranked_puzzle_input = sorted(puzzle_input, key=lambda o: o["cards"])
+    return sum([wager["bid"] * (i + 1) for i, wager in enumerate(ranked_puzzle_input)])
 
 
 if __name__ == "__main__":
