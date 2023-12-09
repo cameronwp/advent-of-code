@@ -164,7 +164,7 @@ class HandJoker(Hand):
 
     def score(self):
         """
-        Returns a 6 bit number to represent the hand's score
+        Returns a 6 bit number to represent the hand's score. Jokers are wild
         111111
         ^ 5 of a kind
          ^ 4 of a kind
@@ -216,9 +216,6 @@ class HandJoker(Hand):
 
         self._score = score
         return score
-
-
-# TODO run tests with weird hands with joker
 
 
 def part2():
