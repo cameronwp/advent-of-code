@@ -107,12 +107,44 @@ def part1():
 
 
 """
+For each history, repeat the process of finding differences until the sequence of differences is entirely zero. Then, rather than adding a zero to the end and filling in the next values of each previous sequence, you should instead add a zero to the beginning of your sequence of zeroes, then fill in new first values for each previous sequence.
+
+In particular, here is what the third example history looks like when extrapolating back in time:
+
+5  10  13  16  21  30  45
+  5   3   3   5   9  15
+   -2   0   2   4   6
+      2   2   2   2
+        0   0   0
+
+Adding the new values on the left side of each sequence from bottom to top eventually reveals the new left-most history value: 5.
+
+Doing this for the remaining example data above results in previous values of -3 for the first history and 0 for the second history. Adding all three new values together produces 2.
+
+Analyze your OASIS report again, this time extrapolating the previous value for each history. What is the sum of these extrapolated values?
 """
 
 
 def part2():
+    next_values = []
+
     for line in open_puzzle_input_and_loop(day=9):
-        pass
+        history = [int(num) for num in line.split() if num not in ["", "\n"]]
+        all_rows = [history]
+        row = history
+        while row := next_row(row):
+            all_rows.append(row)
+
+        # create A
+        all_rows[-1].insert(0, all_rows[-1][0])
+
+        # build up Bs
+        for i in reversed(range(len(all_rows) - 1)):
+            all_rows[i].insert(0, all_rows[i][0] - all_rows[i + 1][0])
+
+        next_values.append(all_rows[0][0])
+
+    return sum(next_values)
 
 
 if __name__ == "__main__":
