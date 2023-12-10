@@ -73,9 +73,37 @@ Analyze your OASIS report and extrapolate the next value for each history. What 
 """
 
 
+def next_row(history: List[int]) -> List[int]:
+    if all([x == 0 for x in history]):
+        return False
+
+    return functools.reduce(
+        lambda curr, n: [*curr, history[n] - history[n - 1]] if n > 0 else curr,
+        range(len(history)),
+        [],
+    )
+
+
 def part1():
+    next_values = []
+
     for line in open_puzzle_input_and_loop(day=9):
-        pass
+        history = [int(num) for num in line.split() if num not in ["", "\n"]]
+        all_rows = [history]
+        row = history
+        while row := next_row(row):
+            all_rows.append(row)
+
+        # create A
+        all_rows[-1].append(all_rows[-1][-1])
+
+        # build up Bs
+        for i in reversed(range(len(all_rows) - 1)):
+            all_rows[i].append(all_rows[i + 1][-1] + all_rows[i][-1])
+
+        next_values.append(all_rows[0][-1])
+
+    return sum(next_values)
 
 
 """
