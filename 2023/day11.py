@@ -2,6 +2,7 @@ from collections import deque
 import functools
 import networkx as nx
 import numpy as np
+from scipy.spatial.distance import cityblock
 import sys
 from typing import List, Set, Tuple
 
@@ -134,6 +135,20 @@ def part1():
         col_first = np.insert(col_first, c, np.zeros(num_rows), axis=0)
 
     expanded_galaxy_map = col_first.T
+    galaxy_rows, galaxy_cols = np.nonzero(expanded_galaxy_map)
+
+    all_distances = 0
+    for i in range(len(galaxy_rows)):
+        for j in reversed(range(len(galaxy_rows))):
+            if i > j:
+                break
+
+            all_distances += cityblock(
+                np.array([galaxy_rows[i], galaxy_cols[i]]),
+                np.array([galaxy_rows[j], galaxy_cols[j]]),
+            )
+
+    return all_distances
 
 
 """
