@@ -101,7 +101,39 @@ Expand the universe, then find the length of the shortest path between every pai
 
 
 def part1():
-    puzzle_input = [line for line in open_puzzle_input_and_loop(day=11)]
+    puzzle_input = [
+        [0 if char == "." else 1 for char in line if char != "\n"]
+        for line in open_puzzle_input_and_loop(day=11)
+    ]
+
+    row_first = np.array(puzzle_input, dtype=np.int8)
+    num_cols = len(puzzle_input[0])
+
+    empty_rows = []
+    empty_cols = []
+
+    for r in range(len(row_first)):
+        empty = all([pos == 0 for pos in row_first[r]])
+        if empty:
+            empty_rows.append(r)
+
+    for r in reversed(empty_rows):
+        row_first = np.insert(row_first, r, np.zeros(num_cols), axis=0)
+
+    # get an accurate count of the number of rows after adding expanded rows
+    num_rows = len(row_first)
+
+    col_first = row_first.T
+
+    for c in range(len(col_first)):
+        empty = all([pos == 0 for pos in col_first[c]])
+        if empty:
+            empty_cols.append(c)
+
+    for c in reversed(empty_cols):
+        col_first = np.insert(col_first, c, np.zeros(num_rows), axis=0)
+
+    expanded_galaxy_map = col_first.T
 
 
 """
