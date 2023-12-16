@@ -152,13 +152,60 @@ def part1():
 
 
 """
-instructions
+Now, instead of the expansion you did before, make each empty row or column one million times larger. That is, each empty row should be replaced with 1000000 empty rows, and each empty column should be replaced with 1000000 empty columns.
+
+(In the example above, if each empty row or column were merely 10 times larger, the sum of the shortest paths between every pair of galaxies would be 1030. If each empty row or column were merely 100 times larger, the sum of the shortest paths between every pair of galaxies would be 8410. However, your universe will need to expand far beyond these values.)
+
+Starting with the same initial image, expand the universe according to these new rules, then find the length of the shortest path between every pair of galaxies. What is the sum of these lengths?
 """
 
 
 def part2():
-    for line in open_puzzle_input_and_loop(day=11):
-        pass
+    puzzle_input = [
+        [0 if char == "." else 1 for char in line if char != "\n"]
+        for line in open_puzzle_input_and_loop(day=11)
+    ]
+
+    row_first = np.array(puzzle_input, dtype=np.int8)
+    galaxy_rows, galaxy_cols = np.nonzero(row_first)
+
+    empty_rows = []
+    empty_cols = []
+
+    for r in range(len(row_first)):
+        empty = all([pos == 0 for pos in row_first[r]])
+        if empty:
+            empty_rows.append(r)
+
+    col_first = row_first.T
+
+    for c in range(len(col_first)):
+        empty = all([pos == 0 for pos in col_first[c]])
+        if empty:
+            empty_cols.append(c)
+
+    for ri in reversed(empty_rows):
+        for rj in reversed(range(len(galaxy_rows))):
+            if galaxy_rows[rj] > ri:
+                galaxy_rows[rj] += 1e6 - 1
+
+    for ci in reversed(empty_cols):
+        for cj in reversed(range(len(galaxy_cols))):
+            if galaxy_cols[cj] > ci:
+                galaxy_cols[cj] += 1e6 - 1
+
+    all_distances = 0
+    for i in range(len(galaxy_rows)):
+        for j in reversed(range(len(galaxy_rows))):
+            if i > j:
+                break
+
+            all_distances += cityblock(
+                np.array([galaxy_rows[i], galaxy_cols[i]]),
+                np.array([galaxy_rows[j], galaxy_cols[j]]),
+            )
+
+    return all_distances
 
 
 if __name__ == "__main__":
